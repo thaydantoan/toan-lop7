@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quiz Số Hữu Tỉ – Cộng/Trừ/Nhân/Chia (20 câu, LaTeX)</title>
+
+<!-- MathJax for $$...$$ LaTeX rendering -->
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+
+<style>
+  :root{
+    --bg:#0b1220;
+    --card:#16233e;
+    --text:#f5f7fb;
+    --muted:#c7cdd6;
+    --accent:#22c55e;
+    --danger:#ef4444;
+    --primary:#3b82f6;
+    --amber:#f59e0b;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, Noto Sans;
+    background: radial-gradient(1400px 700px at 10% -10%, #1e293b 0%, #0b1222 40%, var(--bg) 100%) fixed;
+    color:var(--text); min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:18px;
+  }
+  .app{ width:min(1150px,100%); border-radius:28px; overflow:hidden; border:1px solid rgba(255,255,255,.10);
+    background: linear-gradient(160deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    box-shadow: 0 10px 35px rgba(0,0,0,.45);
+  }
+  header{ display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:14px 18px; border-bottom:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.0));
+  }
+  .brand{ display:flex; gap:12px; align-items:center; font-size:22px; font-weight:900 }
+  .logo{ width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+    background: conic-gradient(from 220deg, var(--primary), var(--amber), var(--accent), var(--primary));
+    color:#091326; font-weight:900;
+  }
+  .controls{ display:flex; gap:8px; flex-wrap:wrap }
+  .btn{ padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.14);
+    background:#1e2b48; color:#fff; font-weight:800; cursor:pointer }
+  .btn.primary{ background: linear-gradient(180deg, rgba(59,130,246,.95), rgba(59,130,246,.75)); border:none }
+  .btn.success{ background: linear-gradient(180deg, rgba(34,197,94,.98), rgba(34,197,94,.78)); border:none }
+  .btn.warn{ background: linear-gradient(180deg, rgba(245,158,11,.98), rgba(245,158,11,.78)); border:none }
+  .switch{ display:inline-flex; align-items:center; gap:8px; color:var(--muted) }
+  .switch input{ display:none }
+  .knob{ width:46px; height:26px; background:#091326; border:1px solid rgba(255,255,255,.18);
+    border-radius:999px; position:relative }
+  .knob::after{ content:""; width:18px; height:18px; background:#fff; border-radius:50%;
+    position:absolute; top:3.5px; left:4px; transition:.2s }
+  .switch input:checked + .knob{ background:rgba(34,197,94,.35); border-color:rgba(34,197,94,.6) }
+  .switch input:checked + .knob::after{ transform: translateX(18px) }
+
+  .hud{ display:grid; grid-template-columns: 1fr auto auto; gap:12px; align-items:center; padding:12px 18px; border-bottom:1px dashed rgba(255,255,255,.12) }
+  .pill{ padding:8px 12px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:999px; font-weight:800 }
+  .timer{ font-weight:900 }
+  .progress{height:10px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
+  .progress>div{height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--accent))}
+
+  main{ padding:16px 18px }
+  .card{ background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+    border:1px solid rgba(255,255,255,.12); border-radius:20px; padding:16px }
+  .question{ font-size:22px; font-weight:900 }
+  .choices{ display:grid; grid-template-columns: 1fr; gap:10px; margin-top:12px }
+  .choice{ background:#10203b; border:2px solid rgba(255,255,255,.12); border-radius:14px; padding:12px; cursor:pointer; display:flex; gap:10px; align-items:flex-start; font-size:18px }
+  .choice.correct{ outline:3px solid var(--accent); border-color:rgba(34,197,94,.7) }
+  .choice.wrong{ outline:3px solid var(--danger); border-color:rgba(239,68,68,.7) }
+  .hint{ color:#ffd38f; font-weight:700; margin-top:10px }
+  .footer{ display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:10px; flex-wrap:wrap }
+
+  .hidden{ display:none !important }
+  .table{ width:100%; border-collapse: collapse; font-size:15px }
+  .table th, .table td{ border-bottom:1px solid rgba(255,255,255,.12); padding:8px 6px; text-align:left }
+  .table th{ color:#cfe3ff }
+  .tools{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 }
+
+  .start .field{ display:grid; gap:6px }
+  input[type="text"], select{ padding:10px 12px; border-radius:10px; border:2px solid rgba(255,255,255,.14); background:#0f172a; color:#fff; font-size:18px }
+  input:focus, select:focus{ border-color: var(--primary) }
+  .error{ color:#ffd3d3 }
+  @media(min-width:760px){ .choices{ grid-template-columns:1fr 1fr } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><div class="logo">G</div><div>Quiz Số Hữu Tỉ – 20 câu (LaTeX)</div></div>
+    <div class="controls">
+      <label class="switch" title="Bật/Tắt âm thanh"><input id="soundToggle" type="checkbox" checked /><span class="knob"></span><span>Âm</span></label>
+      <button id="btnHelp" class="btn">Cách chơi</button>
+      <button id="btnReport" class="btn warn">Báo cáo lớp</button>
+      <button id="btnSettings" class="btn">Cài đặt</button>
+      <button id="btnRestart" class="btn primary">Chơi lại</button>
+    </div>
+  </header>
+
+  <div class="hud">
+    <div class="pill">HS: <b id="playerNameHUD">—</b> <span id="playerClassHUD" style="opacity:.85"></span></div>
+    <div class="pill">Điểm: <b id="score">0</b> • Câu: <b id="qIndex">1</b>/<b id="qTotal">20</b> • Streak: <b id="streak">0</b></div>
+    <div class="pill timer">⏱️ Còn: <span id="time">2400</span>s (≈ <span id="timeMin">40</span>')</div>
+  </div>
+
+  <main>
+    <!-- START -->
+    <section id="screenStart" class="card">
+      <div class="start">
+        <h2 style="margin:4px 0 10px 0">Bắt đầu bài làm</h2>
+        <div class="field"><label for="playerName">Tên học sinh</label><input id="playerName" type="text" placeholder="VD: Nguyễn An"></div>
+        <div class="field"><label for="playerClass">Lớp</label>
+          <select id="playerClass"><option value="">Chọn lớp…</option><option>6A</option><option>6B</option><option>7A</option><option>7B</option><option>8A</option><option>8B</option><option>9A</option><option>9B</option></select>
+        </div>
+        <div id="err" class="error hidden">Vui lòng nhập tên và chọn lớp.</div>
+        <div class="tools">
+          <button id="btnStart" class="btn success">Bắt đầu ▶</button>
+          <button id="btnFillDemo" class="btn">Điền mẫu</button>
+        </div>
+        <div style="opacity:.75;font-size:14px">Công thức hiển thị bằng $$ ... $$ (MathJax). Cần Internet khi mở file để tải thư viện.</div>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="screenQuiz" class="card hidden">
+      <p id="question" class="question">Câu hỏi…</p>
+      <div id="choices" class="choices"></div>
+      <div id="hint" class="hint hidden"></div>
+      <div class="footer">
+        <div>Phím tắt: A/B/C/D chọn đáp án • Enter tiếp tục</div>
+        <button id="btnNext" class="btn">Câu tiếp ▶</button>
+      </div>
+    </section>
+
+    <!-- FINAL -->
+    <section id="screenFinal" class="card hidden">
+      <h2>Kết thúc</h2>
+      <div id="playerSummary" style="opacity:.85;margin-bottom:6px"></div>
+      <div class="pill" style="font-size:22px;margin:8px 0">Điểm: <b id="finalScore">0</b></div>
+      <div class="tools">
+        <div class="pill">Đúng: <b id="statRight">0</b></div>
+        <div class="pill">Sai: <b id="statWrong">0</b></div>
+        <div class="pill">Streak cao nhất: <b id="statMaxStreak">0</b></div>
+        <div class="pill">Thời gian còn: <b id="statTime">0</b>s</div>
+      </div>
+      <div class="tools">
+        <button class="btn primary" id="btnPlayAgain">Làm lại</button>
+      </div>
+    </section>
+
+    <!-- REPORT -->
+    <section id="screenReport" class="card hidden">
+      <h2 style="margin-top:0">Báo cáo kết quả lớp</h2>
+      <div class="tools">
+        <label>Lọc lớp: 
+          <select id="filterClass">
+            <option value="">Tất cả</option>
+            <option>6A</option><option>6B</option><option>7A</option><option>7B</option>
+            <option>8A</option><option>8B</option><option>9A</option><option>9B</option>
+          </select>
+        </label>
+        <button id="btnExport" class="btn success">Xuất CSV</button>
+        <button id="btnClear" class="btn">Xóa dữ liệu lớp (trên máy này)</button>
+      </div>
+      <div style="overflow:auto; max-height:50vh; border:1px solid rgba(255,255,255,.12); border-radius:12px">
+        <table class="table" id="tableReport">
+          <thead>
+            <tr><th>Thời gian</th><th>Họ tên</th><th>Lớp</th><th>Điểm</th><th>Đúng</th><th>Sai</th><th>Streak max</th><th>Thời gian còn</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div style="opacity:.75; font-size:14px; margin-top:8px">Dữ liệu lưu trong trình duyệt (localStorage) của thiết bị này. Dùng “Xuất CSV” để đưa sang Google Sheets / lưu trữ ngoài. Với webhook, dữ liệu còn được gửi tập trung về Google Sheets của giáo viên.</div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="screenSettings" class="card hidden">
+      <h2 style="margin-top:0">Cài đặt Webhook (gửi báo cáo tập trung)</h2>
+      <p>Điền URL webhook (ví dụ: Google Apps Script Web App). Mỗi lần hoàn thành, bài làm sẽ POST JSON lên URL này.</p>
+      <div class="start">
+        <div class="field"><label>Webhook URL</label><input id="webhook" type="text" placeholder="https://script.google.com/macros/s/…/exec" /></div>
+        <div class="field"><label>Webhook Secret (tùy chọn)</label><input id="webhookSecret" type="text" placeholder="Chuỗi bí mật để xác thực (tuỳ chọn)" /></div>
+        <div class="tools">
+          <button id="btnSaveSettings" class="btn success">Lưu cài đặt</button>
+          <button id="btnBackSettings" class="btn">Quay lại</button>
+        </div>
+        <div id="settingsMsg" style="margin-top:6px;opacity:.85"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ---------- BANK: 20 câu – LaTeX $$...$$ ---------- */
+const BANK = [
+  { q: "Giá trị của $$\\frac{2}{3} + \\frac{1}{6}$$ là:", choices: ["$$\\tfrac{1}{2}$$","$$\\tfrac{5}{6}$$","$$\\tfrac{1}{3}$$","$$\\tfrac{7}{6}$$"], answer: 1, hint:"Quy đồng mẫu số trước khi cộng." },
+  { q: "Tính $$\\frac{-5}{12} + \\frac{7}{12}$$", choices:["$$\\tfrac{2}{12}$$","$$\\tfrac{1}{6}$$","$$-\\tfrac{1}{6}$$","$$\\tfrac{12}{12}$$"], answer:1, hint:"Cùng mẫu số, cộng tử số." },
+  { q: "Tính $$\\frac{3}{4} - \\frac{5}{8}$$", choices:["$$\\tfrac{1}{8}$$","$$-\\tfrac{1}{8}$$","$$\\tfrac{7}{8}$$","$$-\\tfrac{7}{8}$$"], answer:0 },
+  { q: "Tính $$\\frac{-7}{10} - \\frac{2}{5}$$", choices:["$$-\\tfrac{11}{10}$$","$$\\tfrac{3}{10}$$","$$-\\tfrac{3}{10}$$","$$-\\tfrac{9}{10}$$"], answer:0 },
+  { q: "Giá trị của $$\\frac{2}{9} \\times \\frac{3}{4}$$ là:", choices:["$$\\tfrac{1}{6}$$","$$\\tfrac{6}{36}$$","$$\\tfrac{1}{18}$$","$$\\tfrac{5}{12}$$"], answer:0 },
+  { q: "Tính $$\\frac{-3}{7} \\times \\frac{14}{9}$$", choices:["$$-\\tfrac{42}{63}$$","$$-\\tfrac{2}{3}$$","$$\\tfrac{2}{3}$$","$$-\\tfrac{4}{9}$$"], answer:1 },
+  { q: "Tính $$\\frac{5}{6} \\times \\frac{-9}{10}$$", choices:["$$-\\tfrac{3}{4}$$","$$-\\tfrac{15}{60}$$","$$\\tfrac{3}{4}$$","$$-\\tfrac{45}{60}$$"], answer:0 },
+  { q: "Kết quả của $$\\frac{2}{3} \\div \\frac{4}{9}$$ là:", choices:["$$\\tfrac{3}{2}$$","$$\\tfrac{3}{4}$$","$$\\tfrac{6}{4}$$","$$\\tfrac{3}{2}$$"], answer:3 },
+  { q: "Tính $$\\frac{-5}{8} \\div \\frac{25}{16}$$", choices:["$$-\\tfrac{2}{5}$$","$$-\\tfrac{16}{40}$$","$$-\\tfrac{3}{5}$$","$$\\tfrac{2}{5}$$"], answer:0 },
+  { q: "Tính $$\\frac{7}{12} + \\frac{5}{18}$$", choices:["$$\\tfrac{41}{36}$$","$$\\tfrac{17}{36}$$","$$\\tfrac{29}{36}$$","$$\\tfrac{31}{36}$$"], answer:3 },
+  { q: "Tính $$\\frac{11}{15} - \\frac{7}{30}$$", choices:["$$\\tfrac{15}{30}$$","$$\\tfrac{15}{60}$$","$$\\tfrac{15}{30}$$","$$\\tfrac{5}{10}$$"], answer:0 },
+  { q: "Giá trị của $$\\frac{-4}{9} + \\frac{-5}{9}$$ là:", choices:["$$-1$$","$$-\\tfrac{1}{9}$$","$$\\tfrac{1}{9}$$","$$-\\tfrac{9}{18}$$"], answer:0 },
+  { q: "Tính $$\\frac{7}{8} - \\frac{3}{16}$$", choices:["$$\\tfrac{11}{16}$$","$$\\tfrac{5}{16}$$","$$\\tfrac{13}{16}$$","$$\\tfrac{17}{16}$$"], answer:2 },
+  { q: "Tính $$\\frac{-2}{3} \\times \\frac{-9}{4}$$", choices:["$$\\tfrac{18}{12}$$","$$\\tfrac{3}{2}$$","$$-\\tfrac{3}{2}$$","$$\\tfrac{9}{6}$$"], answer:1 },
+  { q: "Tính $$\\frac{8}{9} \\div \\frac{2}{27}$$", choices:["$$12$$","$$\\tfrac{16}{9}$$","$$\\tfrac{4}{3}$$","$$\\tfrac{9}{8}$$"], answer:0 },
+  { q: "Tính $$\\frac{3}{5} + \\frac{7}{10} - \\frac{2}{15}$$", choices:["$$\\tfrac{25}{30}$$","$$\\tfrac{11}{15}$$","$$\\tfrac{17}{30}$$","$$\\tfrac{13}{30}$$"], answer:1 },
+  { q: "Tính $$1 - \\frac{3}{8}$$", choices:["$$\\tfrac{5}{8}$$","$$\\tfrac{3}{8}$$","$$\\tfrac{7}{8}$$","$$\\tfrac{1}{8}$$"], answer:2 },
+  { q: "Kết quả của $$\\frac{12}{25} - \\frac{7}{10}$$ là:", choices:["$$-\\tfrac{11}{50}$$","$$-\\tfrac{23}{50}$$","$$\\tfrac{23}{50}$$","$$-\\tfrac{5}{50}$$"], answer:1 },
+  { q: "Tính $$\\frac{-2}{5} + \\frac{9}{20}$$", choices:["$$\\tfrac{1}{20}$$","$$\\tfrac{5}{20}$$","$$\\tfrac{13}{20}$$","$$\\tfrac{7}{20}$$"], answer:0 },
+  { q: "Tính $$\\frac{15}{16} - \\frac{5}{24}$$", choices:["$$\\tfrac{25}{48}$$","$$\\tfrac{35}{48}$$","$$\\tfrac{25}{96}$$","$$\\tfrac{45}{48}$$"], answer:1 }
+];
+
+/* ---------- Audio ---------- */
+let audioCtx; let mute=false;
+function initAudio(){ if(!audioCtx){ const AC = window.AudioContext || window.webkitAudioContext; audioCtx = new AC(); } }
+function beep({type="sine", freq=880, dur=0.12, vol=0.06}){
+  if(mute) return; initAudio(); const t0 = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = type; osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0, t0); gain.gain.linearRampToValueAtTime(vol, t0+0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + Math.max(0.05, dur));
+  osc.connect(gain).connect(audioCtx.destination); osc.start(t0); osc.stop(t0 + dur + 0.05);
+}
+const sfx = {
+  correct: ()=>{ beep({type:"triangle", freq:880, dur:0.12}); setTimeout(()=>beep({type:"triangle", freq:1320, dur:0.12}), 110); },
+  wrong:   ()=>{ beep({type:"sawtooth", freq:180, dur:0.18}); setTimeout(()=>beep({type:"sawtooth", freq:140, dur:0.22}), 120); },
+  next:    ()=>{ beep({type:"square", freq:520, dur:0.06}); },
+  tick:    ()=>{ beep({type:"sine", freq:720, dur:0.04, vol:0.03}); },
+  finish:  ()=>{ beep({type:"triangle", freq:660, dur:0.18}); setTimeout(()=>beep({type:"triangle", freq:990, dur:0.18}), 180); }
+};
+
+/* ---------- Storage Keys ---------- */
+const PLAYER_KEY = "quiz_player";
+const CLASS_RESULTS_KEY = "quiz_class_results";
+const SETTINGS_KEY = "quiz_settings";
+
+/* ---------- State ---------- */
+let order=[]; let index=0; let score=0; let right=0; let wrong=0; let streak=0; let maxStreak=0;
+let timeLeft= BANK.length * 120; // 2 phút mỗi câu
+let timerId=null; let locked=false;
+
+/* ---------- Helpers ---------- */
+const el = (id)=>document.getElementById(id);
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i], a[j]]=[a[j], a[i]]; } return a; }
+function savePlayer(name, clazz){ localStorage.setItem(PLAYER_KEY, JSON.stringify({name, clazz})); }
+function loadPlayer(){ try{ return JSON.parse(localStorage.getItem(PLAYER_KEY)||"null"); }catch{return null;} }
+function loadSettings(){ try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}"); }catch{return {};} }
+function saveSettings(x){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(x)); }
+function pushClassResult(obj){
+  const arr = JSON.parse(localStorage.getItem(CLASS_RESULTS_KEY) || "[]");
+  arr.push(obj);
+  localStorage.setItem(CLASS_RESULTS_KEY, JSON.stringify(arr));
+}
+function fmtMin(sec){ return Math.max(0, Math.floor(sec/60)); }
+
+/* ---------- Elements ---------- */
+const $question = el('question'); const $choices = el('choices'); const $hint = el('hint');
+const $qIndex = el('qIndex'); const $qTotal = el('qTotal') || {textContent:BANK.length}; const $score = el('score');
+const $streak = el('streak'); const $time = el('time'); const $timeMin = el('timeMin');
+const $screenStart = el('screenStart'); const $screenQuiz = el('screenQuiz'); const $screenFinal = el('screenFinal');
+const $playerNameHUD = el('playerNameHUD'); const $playerClassHUD = el('playerClassHUD');
+
+/* ---------- Init ---------- */
+$qTotal.textContent = BANK.length;
+$time.textContent = timeLeft; $timeMin.textContent = fmtMin(timeLeft);
+const prev = loadPlayer(); if(prev){ el('playerName').value = prev.name || ""; el('playerClass').value = prev.clazz || ""; $playerNameHUD.textContent = prev.name || "—"; $playerClassHUD.textContent = prev.clazz ? `(${prev.clazz})` : ""; }
+const settings = loadSettings(); if(settings.webhook){ el('webhook').value = settings.webhook; } if(settings.secret){ el('webhookSecret').value = settings.secret; }
+
+/* ---------- Navigation buttons ---------- */
+el('btnFillDemo').addEventListener('click', ()=>{ el('playerName').value="Nguyễn An"; el('playerClass').value="7A"; });
+el('btnStart').addEventListener('click', ()=>{
+  const name = el('playerName').value.trim(); const clazz = el('playerClass').value.trim(); const err = el('err');
+  if(!name || !clazz){ err.classList.remove('hidden'); return; } err.classList.add('hidden');
+  savePlayer(name, clazz); $playerNameHUD.textContent = name; $playerClassHUD.textContent = `(${clazz})`;
+  start();
+});
+el('btnRestart').addEventListener('click', ()=>{ clearInterval(timerId); showOnly('screenStart'); });
+el('btnPlayAgain').addEventListener('click', ()=> start());
+el('btnNext').addEventListener('click', ()=> next());
+el('btnHelp').addEventListener('click', ()=> alert("Cách chơi:\n- Nhập TÊN & LỚP.\n- 20 câu, 2 phút/câu (tổng 40 phút).\n- A–D chọn đáp án; đúng +10 (thưởng streak), sai -5.\n- Phím: A/B/C/D, Enter.\n- Báo cáo lớp: xem bảng, lọc lớp, xuất CSV; có thể bật webhook gửi về Google Sheets."));
+el('btnReport').addEventListener('click', ()=>{ renderReport(); showOnly('screenReport'); });
+el('btnSettings').addEventListener('click', ()=>{ showOnly('screenSettings'); });
+el('btnSaveSettings').addEventListener('click', ()=>{
+  saveSettings({ webhook: el('webhook').value.trim(), secret: el('webhookSecret').value.trim() });
+  el('settingsMsg').textContent = "Đã lưu cài đặt.";
+});
+el('btnBackSettings').addEventListener('click', ()=>{ showOnly('screenStart'); });
+
+/* ---------- Sound toggle ---------- */
+document.getElementById('soundToggle').addEventListener('change', (e)=>{ mute = !e.target.checked; if(!mute){ initAudio(); sfx.next(); } });
+
+/* ---------- Keyboard ---------- */
+window.addEventListener('keydown', (e)=>{
+  const k = e.key.toLowerCase();
+  if(!$screenQuiz.classList.contains('hidden')){
+    if(['a','b','c','d'].includes(k)){
+      const idx = {a:0,b:1,c:2,d:3}[k];
+      const btn = document.querySelector(`.choice[data-i="${idx}"]`); btn?.click();
+    }else if(k==='enter'){ next(); }
+  } else if(!$screenFinal.classList.contains('hidden') && k==='enter'){ start(); }
+});
+
+/* ---------- Quiz Flow ---------- */
+function showOnly(id){
+  for(const sid of ['screenStart','screenQuiz','screenFinal','screenReport','screenSettings']){
+    el(sid).classList.toggle('hidden', sid!==id);
+  }
+}
+function start(){
+  showOnly('screenQuiz');
+  order = shuffle([...Array(BANK.length).keys()]);
+  index=0; score=0; right=0; wrong=0; streak=0; maxStreak=0;
+  timeLeft= BANK.length * 120; // reset 40 phút
+  el('score').textContent=0; el('streak').textContent=0; el('qIndex').textContent=1;
+  el('time').textContent=timeLeft; el('timeMin').textContent=fmtMin(timeLeft);
+  renderQuestion(); startTimer();
+}
+function startTimer(){
+  if(timerId) clearInterval(timerId);
+  timerId = setInterval(()=>{
+    timeLeft--; el('time').textContent=timeLeft; el('timeMin').textContent=fmtMin(timeLeft);
+    if(timeLeft<=10 && timeLeft>0) sfx.tick();
+    if(timeLeft<=0){ clearInterval(timerId); finish(); }
+  },1000);
+}
+async function typeset(){ if(window.MathJax?.typesetPromise) { try{ await MathJax.typesetPromise(); }catch(e){} } }
+async function renderQuestion(){
+  locked=false; const item=BANK[order[index]];
+  document.getElementById('question').innerHTML = `Câu ${index+1}. ${item.q}`;
+  document.getElementById('choices').innerHTML = "";
+  document.getElementById('hint').classList.add('hidden');
+  item.choices.forEach((t,i)=>{
+    const btn=document.createElement('button'); btn.className='choice'; btn.setAttribute('data-i', i); btn.innerHTML = `<b>${String.fromCharCode(65+i)}.</b> <span>${t}</span>`;
+    btn.onclick=()=>choose(i); document.getElementById('choices').appendChild(btn);
+  });
+  await typeset();
+}
+function choose(i){
+  if(locked) return; locked=true;
+  const item=BANK[order[index]]; const nodes=[...document.querySelectorAll('.choice')]; nodes.forEach(n=>n.disabled=true);
+  if(i===item.answer){
+    nodes[i].classList.add('correct'); right++; streak++; maxStreak=Math.max(maxStreak,streak);
+    const bonus=10+Math.max(0,streak-1)*2; score+=bonus; document.getElementById('score').textContent=score; document.getElementById('streak').textContent=streak; sfx.correct();
+  }else{
+    nodes[i].classList.add('wrong'); nodes[item.answer]?.classList.add('correct'); wrong++; streak=0; document.getElementById('streak').textContent=0; score=Math.max(0, score-5); document.getElementById('score').textContent=score; sfx.wrong();
+    const h = document.getElementById('hint'); h.innerHTML = "Gợi ý: " + (item.hint || "Đọc kỹ đề và quy tắc cộng/trừ/nhân/chia phân số."); h.classList.remove('hidden'); typeset();
+  }
+}
+function next(){ if(!locked){ sfx.next(); streak=0; document.getElementById('streak').textContent=0; } index++; if(index>=BANK.length){ finish(); return; } document.getElementById('qIndex').textContent=index+1; renderQuestion(); sfx.next(); }
+function finish(){
+  showOnly('screenFinal'); clearInterval(timerId);
+  document.getElementById('finalScore').textContent = score; document.getElementById('statRight').textContent = right; document.getElementById('statWrong').textContent = wrong; document.getElementById('statMaxStreak').textContent = maxStreak; document.getElementById('statTime').textContent = Math.max(0,timeLeft);
+  const p = loadPlayer(); document.getElementById('playerSummary').textContent = p ? `Học sinh: ${p.name} – Lớp: ${p.clazz}` : "";
+  const row = { ts: new Date().toISOString(), name: p?.name || "", clazz: p?.clazz || "", score, right, wrong, maxStreak, timeLeft: Math.max(0,timeLeft), userAgent: navigator.userAgent };
+  pushClassResult(row);
+  const wb = loadSettings().webhook; const secret = loadSettings().secret;
+  if(wb){ try{ fetch(wb, { method:"POST", headers:{ "Content-Type":"application/json", ...(secret?{"X-Secret":secret}:{}) }, body: JSON.stringify(row) }); }catch(e){} }
+  sfx.finish();
+}
+
+/* ---------- Report ---------- */
+function getResults(){ try{ return JSON.parse(localStorage.getItem(CLASS_RESULTS_KEY) || "[]"); }catch{return [];} }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function renderReport(){
+  const cls = document.getElementById('filterClass').value.trim();
+  const tbody = document.getElementById('tableReport').querySelector('tbody');
+  tbody.innerHTML="";
+  const rows = getResults().sort((a,b)=> b.ts.localeCompare(a.ts)).filter(r => !cls || r.clazz===cls);
+  for(const r of rows){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${new Date(r.ts).toLocaleString()}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.clazz)}</td><td>${r.score}</td><td>${r.right}</td><td>${r.wrong}</td><td>${r.maxStreak}</td><td>${r.timeLeft}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+document.getElementById('filterClass').addEventListener('change', renderReport);
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  const rows = [["timestamp","name","class","score","right","wrong","maxStreak","timeLeft"]];
+  const cls = document.getElementById('filterClass').value.trim();
+  const data = getResults().filter(r => !cls || r.clazz===cls);
+  for(const r of data){ rows.push([r.ts, r.name, r.clazz, r.score, r.right, r.wrong, r.maxStreak, r.timeLeft]); }
+  const csv = rows.map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`report_${cls || 'all'}.csv`; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 500);
+});
+document.getElementById('btnClear').addEventListener('click', ()=>{
+  if(confirm("Xóa toàn bộ dữ liệu báo cáo lớp trên máy này?")){ localStorage.removeItem(CLASS_RESULTS_KEY); renderReport(); }
+});
+
+</script>
+</body>
+</html>
