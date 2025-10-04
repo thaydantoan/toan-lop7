@@ -1,0 +1,17 @@
+/README.md
+/docs/                ← dùng cho GitHub Pages (dễ nhất)
+  index.html          ← trang mục lục chính
+  /assets/
+    style.css         ← CSS dùng chung
+    script.js         ← JS (nếu cần)
+  /topics/
+    /hinh-hoc-7/      ← 1 chủ đề
+      index.html      ← mục lục riêng của chủ đề
+      bai-01.html
+      bai-02.html
+      ...
+    /so-hoc-7/
+      index.html
+      bai-01.html
+      ...
+
